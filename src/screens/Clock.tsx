@@ -9,8 +9,10 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image,
+  Alert,
 } from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
+import MusicControl, {Command} from 'react-native-music-control';
 
 import {BaseOptions, StackParamList} from '../../App';
 
@@ -61,6 +63,51 @@ export default function Clock({navigation, activeMode}: Props): JSX.Element {
   );
 
   const [gameOver, setGameOver] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    MusicControl.enableControl('volume', true); // Only affected when remoteVolume is enabled
+    MusicControl.enableControl('remoteVolume', false);
+    MusicControl.enableBackgroundMode(true);
+
+    // on iOS, pause playback during audio interruptions (incoming calls) and resume afterwards.
+    // As of {{ INSERT NEXT VERSION HERE}} works for android aswell.
+    MusicControl.handleAudioInterruptions(true);
+
+    MusicControl.on(Command.play, () => {
+      Alert.alert('play');
+    });
+
+    // on iOS this event will also be triggered by audio router change events
+    // happening when headphones are unplugged or a bluetooth audio peripheral disconnects from the device
+    MusicControl.on(Command.pause, () => {
+      Alert.alert('pause');
+    });
+
+    MusicControl.on(Command.stop, () => {
+      Alert.alert('stop');
+    });
+
+    MusicControl.on(Command.nextTrack, () => {
+      Alert.alert('nextTrack');
+    });
+
+    MusicControl.on(Command.previousTrack, () => {
+      Alert.alert('previousTrack');
+    });
+
+    MusicControl.on(Command.changePlaybackPosition, () => {
+      Alert.alert('changePlaybackPosition');
+    });
+
+    MusicControl.on(Command.seekForward, () => {});
+    MusicControl.on(Command.seekBackward, () => {});
+
+    MusicControl.on(Command.skipForward, () => {});
+    MusicControl.on(Command.skipBackward, () => {});
+    MusicControl.on(Command.volume, (volume) => {
+      Alert.alert(volume);
+    });
+  }, []);
 
   const startplayerBottomOrRight = () => {
     setPlayerTopOrLeft({
